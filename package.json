@@ -1,0 +1,13 @@
+{
+  "name": "pagesync",
+  "version": "1.0.0",
+  "description": "Book tracking app with Firebase auth",
+  "type": "module",
+  "scripts": {
+    "dev": "echo 'No dev script needed for static site'"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.0.0"
+  },
+  "devDependencies": {}
+}
