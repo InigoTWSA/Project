@@ -51,7 +51,7 @@
                 try {
                     await signupWithEmail(email, password, username);
                     alert('Account created successfully!');
-                    window.location.href = 'dashboard.html';
+                    window.location.href = 'home.html';
                 } catch (error) {
                     alert('Signup failed: ' + error.message);
                 }
@@ -62,7 +62,7 @@
                 try {
                     await signInWithGoogle();
                     alert('Signed up with Google!');
-                    window.location.href = 'dashboard.html';
+                    window.location.href = 'home.html';
                 } catch (error) {
                     alert('Google signup failed: ' + error.message);
                 }
@@ -71,7 +71,7 @@
             // Check if already signed in
             onAuthStateChange((user) => {
                 if (user) {
-                    window.location.href = 'dashboard.html';
+                    window.location.href = 'home.html';
                 }
             });
         </script>
