@@ -42,19 +42,18 @@
                 try {
                     await loginWithEmail(email, password);
                     alert('Signed in successfully!');
-                    // Redirect to dashboard or home
-                    window.location.href = 'dashboard.html';
+                    window.location.href = 'home.html';
                 } catch (error) {
                     alert('Login failed: ' + error.message);
                 }
             });
-
+            
             googleBtn.addEventListener('click', async (e) => {
                 e.preventDefault();
                 try {
                     await signInWithGoogle();
                     alert('Signed in with Google!');
-                    window.location.href = 'dashboard.html';
+                    window.location.href = 'home.html';
                 } catch (error) {
                     alert('Google sign-in failed: ' + error.message);
                 }
@@ -63,7 +62,7 @@
             // Check if already signed in
             onAuthStateChange((user) => {
                 if (user) {
-                    window.location.href = 'dashboard.html';
+                    window.location.href = 'home.html';
                 }
             });
         </script>
