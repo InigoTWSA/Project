@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Reset password</title>
+        <link rel="stylesheet" href="pagesync.css">
+    </head>
+    <body>
+        <div class="card">
+            <div class="logo">↻</div>
+            <h1>Reset password</h1>
+            <p class="description">Enter your email or username</p>
+            <form id="forgot-form" action="forgotpass-success.html" method="get">
+                <div class="field">
+                    <input type="text" id="identifier" name="identifier" placeholder="Username or email" required>
+                </div>
+                <div class="error-message" id="forgot-error"></div>
+                <div class="submit-row">
+                    <button type="submit" class="button primary">Reset password</button>
+                </div>
+                <a class="back-link" href="login.html">← Back to login</a>
+            </form>
+        </div>
+        <script type="module">
+            import { resetPassword } from './firebase.js';
+
+            const form = document.getElementById('forgot-form');
+            const identifierInput = document.getElementById('identifier');
+            const errorMessage = document.getElementById('forgot-error');
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const identifier = identifierInput.value.trim();
+
+                try {
+                    await resetPassword(identifier);
+                    alert('Password reset email sent!');
+                    window.location.href = 'forgotpass-success.html';
+                } catch (error) {
+                    errorMessage.textContent = 'Error: ' + error.message;
+                }
+            });
+        </script>
+    </body>
+</html>

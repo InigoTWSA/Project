@@ -1,0 +1,165 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background: #101113;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    color: #e6e7e8;
+}
+
+.card {
+    width: 100%;
+    max-width: 380px;
+    background: #1c1f24;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 24px;
+    padding: 40px 30px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+.logo {
+    width: 54px;
+    height: 54px;
+    margin: 0 auto 18px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #c7c9cc;
+    font-size: 28px;
+}
+
+h1 {
+    font-size: 28px;
+    margin-bottom: 28px;
+    font-weight: 500;
+}
+
+.field {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.field input {
+    width: 100%;
+    background: #121417;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 16px 18px;
+    color: #eceeef;
+    font-size: 15px;
+}
+
+.field input::placeholder {
+    color: #7f8490;
+}
+
+.button {
+    width: 100%;
+    border: none;
+    border-radius: 16px;
+    padding: 16px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.submit-row {
+    margin-top: 24px;
+}
+
+.submit-row .primary {
+    background: #3b7df3;
+    color: #fff;
+}
+
+.google-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: #16191e;
+    border: 1px solid rgba(255,255,255,0.08);
+    color: #d1d6dd;
+    padding: 14px 18px;
+    border-radius: 16px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: border-color 0.2s ease;
+}
+
+.google-button:hover {
+    border-color: rgba(255,255,255,0.16);
+}
+
+.google-button img {
+    width: 20px;
+    height: 20px;
+}
+
+.secondary-link {
+    margin-top: 18px;
+    display: inline-block;
+    font-size: 14px;
+    color: #8f97a5;
+    text-decoration: none;
+}
+
+.secondary-link b {
+    color: #e6e7e8;
+}
+
+.secondary-link:hover {
+    color: #cfd4db;
+}
+
+.description {
+    margin-bottom: 24px;
+    color: #b3b8c1;
+    line-height: 1.6;
+    font-size: 14px;
+    text-align: left;
+}
+
+.back-link {
+    margin-top: 18px;
+    display: inline-block;
+    font-size: 14px;
+    color: #8f97a5;
+    text-decoration: none;
+}
+
+.back-link:hover {
+    color: #cfd4db;
+}
+
+.error-message {
+    margin-top: 10px;
+    color: #f08b9d;
+    font-size: 14px;
+    text-align: left;
+    min-height: 20px;
+}
+
+.icon-right {
+    position: relative;
+}
+
+.icon-right::after {
+    content: "\25BC";
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255,255,255,0.55);
+    font-size: 14px;
+}

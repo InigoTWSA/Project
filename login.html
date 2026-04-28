@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Login Page</title>
+        <link rel="stylesheet" href="pagesync.css">
+    </head>
+    <body>
+        <div class="card">
+            <div class="logo">↻</div>
+            <h1>Sign in</h1>
+            <form id="login-form" action="#" method="post">
+                <div class="field">
+                    <input type="text" id="username" name="username" placeholder="Email Address" required>
+                </div>
+                <div class="field icon-right">
+                    <input type="password" id="password" name="password" placeholder="Password" required>
+                </div>
+                <div class="submit-row">
+                    <button type="submit" class="button primary">Sign in</button>
+                </div>
+                <a class="google-button" id="google-signin" href="#">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo">
+                    Sign In with Google
+                </a>
+                <a class="secondary-link" href="forgotpass.html">Forgot Password?</a>
+                <a class="secondary-link" href="signup.html">Don't have an account? <b>Sign Up</b></a>
+            </form>
+        </div>
+        <script type="module">
+            import { loginWithEmail, signInWithGoogle, onAuthStateChange } from './firebase.js';
+
+            const form = document.getElementById('login-form');
+            const googleBtn = document.getElementById('google-signin');
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = usernameInput.value.trim();
+                const password = passwordInput.value;
+
+                try {
+                    await loginWithEmail(email, password);
+                    alert('Signed in successfully!');
+                    // Redirect to dashboard or home
+                    window.location.href = 'dashboard.html';
+                } catch (error) {
+                    alert('Login failed: ' + error.message);
+                }
+            });
+
+            googleBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                try {
+                    await signInWithGoogle();
+                    alert('Signed in with Google!');
+                    window.location.href = 'dashboard.html';
+                } catch (error) {
+                    alert('Google sign-in failed: ' + error.message);
+                }
+            });
+
+            // Check if already signed in
+            onAuthStateChange((user) => {
+                if (user) {
+                    window.location.href = 'dashboard.html';
+                }
+            });
+        </script>
+    </body>
+</html>

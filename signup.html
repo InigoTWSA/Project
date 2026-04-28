@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Sign Up</title>
+        <link rel="stylesheet" href="pagesync.css">
+    </head>
+    <body>
+        <div class="card">
+            <div class="logo">↻</div>
+            <h1>Sign up</h1>
+            <form id="signup-form" action="#" method="post">
+                <div class="field">
+                    <input type="text" id="name" name="name" placeholder="Name" required>
+                </div>
+                <div class="field">
+                    <input type="email" id="email" name="email" placeholder="Email Address" required>
+                </div>
+                <div class="field">
+                    <input type="text" id="username" name="username" placeholder="Username" required>
+                </div>
+                <div class="field icon-right">
+                    <input type="password" id="password" name="password" placeholder="Password" required>
+                </div>
+                <div class="submit-row">
+                    <button type="submit" class="button primary">Sign up</button>
+                </div>
+                <a class="google-button" id="google-signup" href="#">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo">
+                    Sign In with Google
+                </a>
+                <a class="secondary-link" href="login.html">Already have an account? <b>Sign in</b></a>
+            </form>
+        </div>
+        <script type="module">
+            import { signupWithEmail, signInWithGoogle, onAuthStateChange } from './firebase.js';
+
+            const form = document.getElementById('signup-form');
+            const googleBtn = document.getElementById('google-signup');
+            const nameInput = document.getElementById('name');
+            const emailInput = document.getElementById('email');
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const name = nameInput.value.trim();
+                const email = emailInput.value.trim();
+                const username = usernameInput.value.trim();
+                const password = passwordInput.value;
+
+                try {
+                    await signupWithEmail(email, password, username);
+                    alert('Account created successfully!');
+                    window.location.href = 'dashboard.html';
+                } catch (error) {
+                    alert('Signup failed: ' + error.message);
+                }
+            });
+
+            googleBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                try {
+                    await signInWithGoogle();
+                    alert('Signed up with Google!');
+                    window.location.href = 'dashboard.html';
+                } catch (error) {
+                    alert('Google signup failed: ' + error.message);
+                }
+            });
+
+            // Check if already signed in
+            onAuthStateChange((user) => {
+                if (user) {
+                    window.location.href = 'dashboard.html';
+                }
+            });
+        </script>
+    </body>
+</html>
