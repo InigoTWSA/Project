@@ -4,12 +4,12 @@ import { getAuth, GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPas
 import { getFirestore, doc, getDoc, setDoc, collection, addDoc, getDocs, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyBEgkePSSuw1LkVOXLWL__pzcC11HGY_Ww",
+  authDomain: "pagesync-7a722.firebaseapp.com",
+  projectId: "pagesync-7a722",
+  storageBucket: "pagesync-7a722.appspot.com",
+  messagingSenderId: "612753494941",
+  appId: "1:612753494941:web:192411b4fca39ddfdf9574"
 };
 
 const app = initializeApp(firebaseConfig);
