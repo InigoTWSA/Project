@@ -10,16 +10,14 @@
             <h1>Sign up</h1>
             <form id="signup-form" action="#" method="post">
                 <div class="field">
-                    <input type="text" id="name" name="name" placeholder="Name" required>
+                    <input type="text" id="username" name="username" placeholder="Username" required>
                 </div>
                 <div class="field">
                     <input type="email" id="email" name="email" placeholder="Email Address" required>
                 </div>
-                <div class="field">
-                    <input type="text" id="username" name="username" placeholder="Username" required>
-                </div>
-                <div class="field icon-right">
+                <div class="field password-wrapper">
                     <input type="password" id="password" name="password" placeholder="Password" required>
+                    <button type="button" class="password-toggle" id="password-toggle">👁️</button>
                 </div>
                 <div class="submit-row">
                     <button type="submit" class="button primary">Sign up</button>
@@ -36,14 +34,20 @@
 
             const form = document.getElementById('signup-form');
             const googleBtn = document.getElementById('google-signup');
-            const nameInput = document.getElementById('name');
             const emailInput = document.getElementById('email');
             const usernameInput = document.getElementById('username');
             const passwordInput = document.getElementById('password');
+            const passwordToggle = document.getElementById('password-toggle');
+
+            passwordToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                const isPassword = passwordInput.type === 'password';
+                passwordInput.type = isPassword ? 'text' : 'password';
+                passwordToggle.textContent = isPassword ? '👁️‍🗨️' : '👁️';
+            });
 
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const name = nameInput.value.trim();
                 const email = emailInput.value.trim();
                 const username = usernameInput.value.trim();
                 const password = passwordInput.value;
