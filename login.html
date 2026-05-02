@@ -2,7 +2,7 @@
 <html>
     <head>
         <title>Login Page</title>
-        <link rel="stylesheet" href="pagesync.css">
+        <link rel="stylesheet" href="../css/pagesync.css">
         <style>
             /* ── Inline OTP ──────────────────────────────────────── */
             .otp-inline {
@@ -45,9 +45,7 @@
                 display: inline;
             }
 
-            .resend-link:hover {
-                color: #7aabff;
-            }
+            .resend-link:hover { color: #7aabff; }
 
             /* ── T&C Modal ───────────────────────────────────────── */
             .terms-layer {
@@ -63,9 +61,7 @@
                 padding: 20px;
             }
 
-            .terms-layer.open {
-                display: flex;
-            }
+            .terms-layer.open { display: flex; }
 
             .terms-card {
                 width: min(480px, 100%);
@@ -93,9 +89,7 @@
                 text-align: left;
             }
 
-            .terms-content ol {
-                padding-left: 20px;
-            }
+            .terms-content ol { padding-left: 20px; }
 
             .terms-content ol li {
                 font-size: 14px;
@@ -132,7 +126,6 @@
                 text-align: center;
             }
 
-            /* ── T&C link in form ────────────────────────────────── */
             .terms-trigger-row {
                 margin-top: 16px;
                 text-align: center;
@@ -150,9 +143,7 @@
                 transition: color 0.15s;
             }
 
-            .terms-trigger-btn:hover {
-                color: #a0a8b8;
-            }
+            .terms-trigger-btn:hover { color: #a0a8b8; }
         </style>
     </head>
     <body>
@@ -161,13 +152,12 @@
             <h1>Sign in</h1>
             <form id="login-form" action="#" method="post">
 
-                <!-- Email -->
                 <div class="field">
                     <input type="text" id="username" name="username"
                         placeholder="Email Address" required autocomplete="email">
                 </div>
 
-                <!-- OTP — inline, slides in below email -->
+                <!-- OTP slides in below email -->
                 <div class="otp-inline" id="otp-inline">
                     <div class="field">
                         <input type="text" id="otp-code" maxlength="6"
@@ -180,7 +170,6 @@
                     </button>
                 </div>
 
-                <!-- Password -->
                 <div class="field password-wrapper">
                     <input type="password" id="password" name="password"
                         placeholder="Password" required autocomplete="current-password">
@@ -199,7 +188,6 @@
                 <a class="secondary-link" href="forgotpass.html">Forgot Password?</a>
                 <a class="secondary-link" href="signup.html">Don't have an account? <b>Sign Up</b></a>
 
-                <!-- T&C trigger -->
                 <div class="terms-trigger-row">
                     <button type="button" class="terms-trigger-btn" id="terms-trigger">
                         Terms &amp; Conditions
@@ -234,27 +222,25 @@
         </div>
 
         <script type="module">
-            import { loginWithEmail, signInWithGoogle, onAuthStateChange } from 'firebase.js';
+            import { loginWithEmail, signInWithGoogle, onAuthStateChange } from './firebase.js';
 
-            const form          = document.getElementById('login-form');
-            const googleBtn     = document.getElementById('google-signin');
-            const usernameInput = document.getElementById('username');
-            const passwordInput = document.getElementById('password');
+            const form           = document.getElementById('login-form');
+            const googleBtn      = document.getElementById('google-signin');
+            const usernameInput  = document.getElementById('username');
+            const passwordInput  = document.getElementById('password');
             const passwordToggle = document.getElementById('password-toggle');
-            const submitBtn     = document.getElementById('submit-btn');
+            const submitBtn      = document.getElementById('submit-btn');
+            const otpInline      = document.getElementById('otp-inline');
+            const otpCodeInput   = document.getElementById('otp-code');
+            const resendBtn      = document.getElementById('resend-otp');
+            const termsLayer     = document.getElementById('terms-layer');
+            const termsClose     = document.getElementById('terms-close');
+            const termsAccept    = document.getElementById('terms-accept');
+            const termsTrigger   = document.getElementById('terms-trigger');
 
-            const otpInline     = document.getElementById('otp-inline');
-            const otpCodeInput  = document.getElementById('otp-code');
-            const resendBtn     = document.getElementById('resend-otp');
+            let otpStep = false;
 
-            const termsLayer    = document.getElementById('terms-layer');
-            const termsClose    = document.getElementById('terms-close');
-            const termsAccept   = document.getElementById('terms-accept');
-            const termsTrigger  = document.getElementById('terms-trigger');
-
-            let otpStep = false; // false = normal sign-in, true = waiting for OTP
-
-            // ── Password toggle ───────────────────────────────────
+            // Password toggle
             passwordToggle.addEventListener('click', e => {
                 e.preventDefault();
                 const isPass = passwordInput.type === 'password';
@@ -262,19 +248,14 @@
                 passwordToggle.textContent = isPass ? '👁️‍🗨️' : '👁️';
             });
 
-            // ── Sign in form ──────────────────────────────────────
+            // Sign in
             form.addEventListener('submit', async e => {
                 e.preventDefault();
 
                 if (otpStep) {
-                    // OTP verification step
                     const code = otpCodeInput.value.trim();
-                    if (!code || code.length < 6) {
-                        otpCodeInput.focus();
-                        return;
-                    }
-                    // TODO: verify OTP with your backend/Firebase
-                    // For now, proceed after code entry
+                    if (!code || code.length < 6) { otpCodeInput.focus(); return; }
+                    // TODO: wire up OTP verification
                     alert('OTP verified! (wire up verification logic here)');
                     return;
                 }
@@ -282,41 +263,25 @@
                 const email    = usernameInput.value.trim();
                 const password = passwordInput.value;
 
-                submitBtn.disabled   = true;
+                submitBtn.disabled    = true;
                 submitBtn.textContent = 'Signing in…';
 
                 try {
                     await loginWithEmail(email, password);
                     window.location.href = 'home.html';
                 } catch (error) {
-                    submitBtn.disabled   = false;
+                    submitBtn.disabled    = false;
                     submitBtn.textContent = 'Sign in';
                     alert('Login failed: ' + error.message);
                 }
             });
 
-            // ── Show OTP inline (call this when you want to trigger OTP step) ──
-            function showOtp() {
-                otpStep = true;
-                otpInline.classList.add('visible');
-                submitBtn.textContent = 'Verify Code';
-                setTimeout(() => otpCodeInput.focus(), 350);
-            }
-
-            function hideOtp() {
-                otpStep = false;
-                otpInline.classList.remove('visible');
-                otpCodeInput.value    = '';
-                submitBtn.textContent = 'Sign in';
-            }
-
             resendBtn.addEventListener('click', () => {
-                // TODO: resend OTP logic
                 resendBtn.textContent = 'Sent!';
-                setTimeout(() => { resendBtn.textContent = 'Didn\'t receive it? Resend code'; }, 3000);
+                setTimeout(() => { resendBtn.textContent = "Didn't receive it? Resend code"; }, 3000);
             });
 
-            // ── Google sign-in ────────────────────────────────────
+            // Google sign-in
             googleBtn.addEventListener('click', async e => {
                 e.preventDefault();
                 try {
@@ -327,28 +292,18 @@
                 }
             });
 
-            // ── Terms & Conditions modal ──────────────────────────
-            termsTrigger.addEventListener('click', () => {
-                termsLayer.classList.add('open');
-            });
-
-            termsClose.addEventListener('click', () => {
-                termsLayer.classList.remove('open');
-            });
-
-            termsAccept.addEventListener('click', () => {
-                termsLayer.classList.remove('open');
-            });
-
+            // Terms & Conditions
+            termsTrigger.addEventListener('click', () => termsLayer.classList.add('open'));
+            termsClose.addEventListener('click',   () => termsLayer.classList.remove('open'));
+            termsAccept.addEventListener('click',  () => termsLayer.classList.remove('open'));
             termsLayer.addEventListener('click', e => {
                 if (e.target === termsLayer) termsLayer.classList.remove('open');
             });
-
             document.addEventListener('keydown', e => {
                 if (e.key === 'Escape') termsLayer.classList.remove('open');
             });
 
-            // ── Redirect if already signed in ────────────────────
+            // Redirect if already signed in
             onAuthStateChange(user => {
                 if (user) window.location.href = 'home.html';
             });

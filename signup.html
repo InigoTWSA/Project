@@ -2,7 +2,7 @@
 <html>
     <head>
         <title>Sign Up</title>
-        <link rel="stylesheet" href="pagesync.css">
+        <link rel="stylesheet" href="../css/pagesync.css">
         <style>
             /* ── Inline OTP ──────────────────────────────────────── */
             .otp-inline {
@@ -19,9 +19,7 @@
                 margin-bottom: 0;
             }
 
-            .otp-inline .field {
-                margin-bottom: 0;
-            }
+            .otp-inline .field { margin-bottom: 0; }
 
             .otp-hint {
                 font-size: 12px;
@@ -42,14 +40,15 @@
                 transition: color 0.15s;
             }
 
-            .resend-link:hover {
-                color: #7aabff;
-            }
+            .resend-link:hover { color: #7aabff; }
 
             /* ── Checkbox row ────────────────────────────────────── */
             .checkbox-row {
                 margin-top: 16px;
                 text-align: left;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
             }
 
             .terms-checkbox {
@@ -69,6 +68,7 @@
                 flex-shrink: 0;
             }
 
+            /* T&C button sits OUTSIDE the label — fixes click interception */
             .link-button {
                 background: none;
                 border: none;
@@ -79,11 +79,10 @@
                 text-decoration: underline;
                 text-underline-offset: 3px;
                 transition: color 0.15s;
+                text-align: left;
             }
 
-            .link-button:hover {
-                color: #7aabff;
-            }
+            .link-button:hover { color: #7aabff; }
 
             /* ── T&C Modal ───────────────────────────────────────── */
             .terms-layer {
@@ -99,9 +98,7 @@
                 padding: 20px;
             }
 
-            .terms-layer.open {
-                display: flex;
-            }
+            .terms-layer.open { display: flex; }
 
             .terms-card {
                 width: min(480px, 100%);
@@ -129,9 +126,7 @@
                 text-align: left;
             }
 
-            .terms-content ol {
-                padding-left: 20px;
-            }
+            .terms-content ol { padding-left: 20px; }
 
             .terms-content ol li {
                 font-size: 14px;
@@ -175,19 +170,17 @@
             <h1>Sign up</h1>
             <form id="signup-form" action="#" method="post">
 
-                <!-- Username -->
                 <div class="field">
                     <input type="text" id="username" name="username"
                         placeholder="Username" required autocomplete="username">
                 </div>
 
-                <!-- Email -->
                 <div class="field">
                     <input type="email" id="email" name="email"
                         placeholder="Email Address" required autocomplete="email">
                 </div>
 
-                <!-- OTP — inline, slides in below email -->
+                <!-- OTP slides in below email -->
                 <div class="otp-inline" id="otp-inline">
                     <div class="field">
                         <input type="text" id="otp-code" maxlength="6"
@@ -200,7 +193,6 @@
                     </button>
                 </div>
 
-                <!-- Password -->
                 <div class="field password-wrapper">
                     <input type="password" id="password" name="password"
                         placeholder="Password" required autocomplete="new-password">
@@ -216,16 +208,18 @@
                     Sign In with Google
                 </a>
 
-                <!-- T&C checkbox -->
+                <!--
+                    T&C: checkbox and button are SEPARATE elements.
+                    Button is NOT inside the label to avoid click interception.
+                -->
                 <div class="checkbox-row">
                     <label class="terms-checkbox">
                         <input type="checkbox" id="terms-checkbox">
-                        <span>I agree to these
-                            <button type="button" class="link-button" id="terms-link">
-                                Terms &amp; Conditions
-                            </button>
-                        </span>
+                        <span>I agree to the Terms &amp; Conditions</span>
                     </label>
+                    <button type="button" class="link-button" id="terms-link">
+                        Read Terms &amp; Conditions
+                    </button>
                 </div>
 
                 <a class="secondary-link" href="login.html">Already have an account? <b>Sign in</b></a>
@@ -257,7 +251,7 @@
         </div>
 
         <script type="module">
-            import { signupWithEmail, signInWithGoogle, onAuthStateChange } from 'firebase.js';
+            import { signupWithEmail, signInWithGoogle, onAuthStateChange } from './firebase.js';
 
             const form           = document.getElementById('signup-form');
             const googleBtn      = document.getElementById('google-signup');
@@ -267,11 +261,9 @@
             const passwordToggle = document.getElementById('password-toggle');
             const submitBtn      = document.getElementById('submit-btn');
             const termsCheckbox  = document.getElementById('terms-checkbox');
-
             const otpInline      = document.getElementById('otp-inline');
             const otpCodeInput   = document.getElementById('otp-code');
             const resendBtn      = document.getElementById('resend-otp');
-
             const termsLayer     = document.getElementById('terms-layer');
             const termsClose     = document.getElementById('terms-close');
             const termsAccept    = document.getElementById('terms-accept');
@@ -279,7 +271,7 @@
 
             let otpStep = false;
 
-            // ── Password toggle ───────────────────────────────────
+            // Password toggle
             passwordToggle.addEventListener('click', e => {
                 e.preventDefault();
                 const isPass = passwordInput.type === 'password';
@@ -287,17 +279,13 @@
                 passwordToggle.textContent = isPass ? '👁️‍🗨️' : '👁️';
             });
 
-            // ── Sign up form ──────────────────────────────────────
+            // Sign up
             form.addEventListener('submit', async e => {
                 e.preventDefault();
 
                 if (otpStep) {
                     const code = otpCodeInput.value.trim();
-                    if (!code || code.length < 6) {
-                        otpCodeInput.focus();
-                        return;
-                    }
-                    // TODO: verify OTP with your backend/Firebase
+                    if (!code || code.length < 6) { otpCodeInput.focus(); return; }
                     alert('OTP verified! (wire up verification logic here)');
                     return;
                 }
@@ -324,28 +312,12 @@
                 }
             });
 
-            // ── OTP helpers ───────────────────────────────────────
-            function showOtp() {
-                otpStep = true;
-                otpInline.classList.add('visible');
-                submitBtn.textContent = 'Verify Code';
-                setTimeout(() => otpCodeInput.focus(), 350);
-            }
-
-            function hideOtp() {
-                otpStep = false;
-                otpInline.classList.remove('visible');
-                otpCodeInput.value    = '';
-                submitBtn.textContent = 'Sign up';
-            }
-
             resendBtn.addEventListener('click', () => {
-                // TODO: resend OTP logic
                 resendBtn.textContent = 'Sent!';
                 setTimeout(() => { resendBtn.textContent = "Didn't receive it? Resend code"; }, 3000);
             });
 
-            // ── Google sign-up ────────────────────────────────────
+            // Google sign-up
             googleBtn.addEventListener('click', async e => {
                 e.preventDefault();
                 try {
@@ -356,29 +328,21 @@
                 }
             });
 
-            // ── Terms & Conditions modal ──────────────────────────
-            termsLink.addEventListener('click', () => {
-                termsLayer.classList.add('open');
-            });
-
-            termsClose.addEventListener('click', () => {
-                termsLayer.classList.remove('open');
-            });
-
+            // Terms & Conditions
+            termsLink.addEventListener('click',   () => termsLayer.classList.add('open'));
+            termsClose.addEventListener('click',  () => termsLayer.classList.remove('open'));
             termsAccept.addEventListener('click', () => {
                 termsLayer.classList.remove('open');
-                termsCheckbox.checked = true; // auto-check on accept
+                termsCheckbox.checked = true; // auto-check when they accept
             });
-
             termsLayer.addEventListener('click', e => {
                 if (e.target === termsLayer) termsLayer.classList.remove('open');
             });
-
             document.addEventListener('keydown', e => {
                 if (e.key === 'Escape') termsLayer.classList.remove('open');
             });
 
-            // ── Redirect if already signed in ────────────────────
+            // Redirect if already signed in
             onAuthStateChange(user => {
                 if (user) window.location.href = 'home.html';
             });
