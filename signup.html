@@ -3,80 +3,384 @@
     <head>
         <title>Sign Up</title>
         <link rel="stylesheet" href="pagesync.css">
+        <style>
+            /* ── Inline OTP ──────────────────────────────────────── */
+            .otp-inline {
+                overflow: hidden;
+                max-height: 0;
+                opacity: 0;
+                transition: max-height 0.35s ease, opacity 0.3s ease, margin 0.3s ease;
+                margin-bottom: 0;
+            }
+
+            .otp-inline.visible {
+                max-height: 120px;
+                opacity: 1;
+                margin-bottom: 0;
+            }
+
+            .otp-inline .field {
+                margin-bottom: 0;
+            }
+
+            .otp-hint {
+                font-size: 12px;
+                color: #606880;
+                margin: 6px 0 0 4px;
+            }
+
+            .resend-link {
+                font-size: 12px;
+                color: #3b7df3;
+                background: none;
+                border: none;
+                cursor: pointer;
+                padding: 0;
+                margin-top: 6px;
+                margin-left: 4px;
+                display: inline;
+                transition: color 0.15s;
+            }
+
+            .resend-link:hover {
+                color: #7aabff;
+            }
+
+            /* ── Checkbox row ────────────────────────────────────── */
+            .checkbox-row {
+                margin-top: 16px;
+                text-align: left;
+            }
+
+            .terms-checkbox {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-size: 13px;
+                color: #8f97a5;
+                cursor: pointer;
+            }
+
+            .terms-checkbox input[type="checkbox"] {
+                width: 16px;
+                height: 16px;
+                accent-color: #3b7df3;
+                cursor: pointer;
+                flex-shrink: 0;
+            }
+
+            .link-button {
+                background: none;
+                border: none;
+                color: #3b7df3;
+                cursor: pointer;
+                font-size: 13px;
+                padding: 0;
+                text-decoration: underline;
+                text-underline-offset: 3px;
+                transition: color 0.15s;
+            }
+
+            .link-button:hover {
+                color: #7aabff;
+            }
+
+            /* ── T&C Modal ───────────────────────────────────────── */
+            .terms-layer {
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,0.7);
+                backdrop-filter: blur(4px);
+                -webkit-backdrop-filter: blur(4px);
+                display: none;
+                align-items: center;
+                justify-content: center;
+                z-index: 50;
+                padding: 20px;
+            }
+
+            .terms-layer.open {
+                display: flex;
+            }
+
+            .terms-card {
+                width: min(480px, 100%);
+                background: #1c1f24;
+                border: 1px solid rgba(255,255,255,0.1);
+                border-radius: 24px;
+                padding: 32px 28px;
+                position: relative;
+                max-height: 85vh;
+                overflow-y: auto;
+            }
+
+            .terms-card h2 {
+                font-size: 20px;
+                font-weight: 600;
+                margin-bottom: 18px;
+                color: #f0f2f5;
+            }
+
+            .terms-content p {
+                font-size: 14px;
+                color: #8f97a5;
+                margin-bottom: 14px;
+                line-height: 1.7;
+                text-align: left;
+            }
+
+            .terms-content ol {
+                padding-left: 20px;
+            }
+
+            .terms-content ol li {
+                font-size: 14px;
+                color: #8f97a5;
+                margin-bottom: 10px;
+                line-height: 1.7;
+            }
+
+            .overlay-close {
+                position: absolute;
+                top: 18px;
+                right: 18px;
+                background: rgba(255,255,255,0.06);
+                border: none;
+                color: #9aa0ad;
+                font-size: 16px;
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: background 0.15s;
+            }
+
+            .overlay-close:hover {
+                background: rgba(255,255,255,0.12);
+                color: #e6e7e8;
+            }
+
+            .terms-footer {
+                margin-top: 22px;
+                text-align: center;
+            }
+        </style>
     </head>
     <body>
         <div class="card">
             <div class="logo">↻</div>
             <h1>Sign up</h1>
             <form id="signup-form" action="#" method="post">
+
+                <!-- Username -->
                 <div class="field">
-                    <input type="text" id="username" name="username" placeholder="Username" required>
+                    <input type="text" id="username" name="username"
+                        placeholder="Username" required autocomplete="username">
                 </div>
+
+                <!-- Email -->
                 <div class="field">
-                    <input type="email" id="email" name="email" placeholder="Email Address" required>
+                    <input type="email" id="email" name="email"
+                        placeholder="Email Address" required autocomplete="email">
                 </div>
+
+                <!-- OTP — inline, slides in below email -->
+                <div class="otp-inline" id="otp-inline">
+                    <div class="field">
+                        <input type="text" id="otp-code" maxlength="6"
+                            placeholder="Enter 6-digit code" inputmode="numeric"
+                            autocomplete="one-time-code">
+                    </div>
+                    <p class="otp-hint">A verification code was sent to your email.</p>
+                    <button type="button" class="resend-link" id="resend-otp">
+                        Didn't receive it? Resend code
+                    </button>
+                </div>
+
+                <!-- Password -->
                 <div class="field password-wrapper">
-                    <input type="password" id="password" name="password" placeholder="Password" required>
+                    <input type="password" id="password" name="password"
+                        placeholder="Password" required autocomplete="new-password">
                     <button type="button" class="password-toggle" id="password-toggle">👁️</button>
                 </div>
+
                 <div class="submit-row">
-                    <button type="submit" class="button primary">Sign up</button>
+                    <button type="submit" class="button primary" id="submit-btn">Sign up</button>
                 </div>
+
                 <a class="google-button" id="google-signup" href="#">
                     <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo">
                     Sign In with Google
                 </a>
+
+                <!-- T&C checkbox -->
+                <div class="checkbox-row">
+                    <label class="terms-checkbox">
+                        <input type="checkbox" id="terms-checkbox">
+                        <span>I agree to these
+                            <button type="button" class="link-button" id="terms-link">
+                                Terms &amp; Conditions
+                            </button>
+                        </span>
+                    </label>
+                </div>
+
                 <a class="secondary-link" href="login.html">Already have an account? <b>Sign in</b></a>
             </form>
         </div>
+
+        <!-- Terms & Conditions Modal -->
+        <div class="terms-layer" id="terms-layer">
+            <div class="terms-card">
+                <button class="overlay-close" id="terms-close" aria-label="Close">✕</button>
+                <h2>Terms &amp; Conditions</h2>
+                <div class="terms-content">
+                    <p>Welcome to PageSync. By using this website, you agree to the following terms and conditions:</p>
+                    <ol>
+                        <li>All content on PageSync is for personal use only.</li>
+                        <li>You must not share login credentials with others.</li>
+                        <li>PageSync is not responsible for third-party content linked from our pages.</li>
+                        <li>We may update these terms at any time, and continued use means acceptance.</li>
+                        <li>Respect copyright, privacy, and community guidelines while using the site.</li>
+                    </ol>
+                </div>
+                <div class="terms-footer">
+                    <button class="button primary" id="terms-accept"
+                        style="max-width:160px; margin:0 auto; display:block;">
+                        Got it
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <script type="module">
-            import { signupWithEmail, signInWithGoogle, onAuthStateChange } from './firebase.js';
+            import { signupWithEmail, signInWithGoogle, onAuthStateChange } from '../js/firebase.js';
 
-            const form = document.getElementById('signup-form');
-            const googleBtn = document.getElementById('google-signup');
-            const emailInput = document.getElementById('email');
-            const usernameInput = document.getElementById('username');
-            const passwordInput = document.getElementById('password');
+            const form           = document.getElementById('signup-form');
+            const googleBtn      = document.getElementById('google-signup');
+            const emailInput     = document.getElementById('email');
+            const usernameInput  = document.getElementById('username');
+            const passwordInput  = document.getElementById('password');
             const passwordToggle = document.getElementById('password-toggle');
+            const submitBtn      = document.getElementById('submit-btn');
+            const termsCheckbox  = document.getElementById('terms-checkbox');
 
-            passwordToggle.addEventListener('click', (e) => {
+            const otpInline      = document.getElementById('otp-inline');
+            const otpCodeInput   = document.getElementById('otp-code');
+            const resendBtn      = document.getElementById('resend-otp');
+
+            const termsLayer     = document.getElementById('terms-layer');
+            const termsClose     = document.getElementById('terms-close');
+            const termsAccept    = document.getElementById('terms-accept');
+            const termsLink      = document.getElementById('terms-link');
+
+            let otpStep = false;
+
+            // ── Password toggle ───────────────────────────────────
+            passwordToggle.addEventListener('click', e => {
                 e.preventDefault();
-                const isPassword = passwordInput.type === 'password';
-                passwordInput.type = isPassword ? 'text' : 'password';
-                passwordToggle.textContent = isPassword ? '👁️‍🗨️' : '👁️';
+                const isPass = passwordInput.type === 'password';
+                passwordInput.type = isPass ? 'text' : 'password';
+                passwordToggle.textContent = isPass ? '👁️‍🗨️' : '👁️';
             });
 
-            form.addEventListener('submit', async (e) => {
+            // ── Sign up form ──────────────────────────────────────
+            form.addEventListener('submit', async e => {
                 e.preventDefault();
-                const email = emailInput.value.trim();
+
+                if (otpStep) {
+                    const code = otpCodeInput.value.trim();
+                    if (!code || code.length < 6) {
+                        otpCodeInput.focus();
+                        return;
+                    }
+                    // TODO: verify OTP with your backend/Firebase
+                    alert('OTP verified! (wire up verification logic here)');
+                    return;
+                }
+
+                if (!termsCheckbox.checked) {
+                    alert('Please agree to the Terms & Conditions to continue.');
+                    return;
+                }
+
+                const email    = emailInput.value.trim();
                 const username = usernameInput.value.trim();
                 const password = passwordInput.value;
 
+                submitBtn.disabled    = true;
+                submitBtn.textContent = 'Creating account…';
+
                 try {
                     await signupWithEmail(email, password, username);
-                    alert('Account created successfully!');
                     window.location.href = 'home.html';
                 } catch (error) {
+                    submitBtn.disabled    = false;
+                    submitBtn.textContent = 'Sign up';
                     alert('Signup failed: ' + error.message);
                 }
             });
 
-            googleBtn.addEventListener('click', async (e) => {
+            // ── OTP helpers ───────────────────────────────────────
+            function showOtp() {
+                otpStep = true;
+                otpInline.classList.add('visible');
+                submitBtn.textContent = 'Verify Code';
+                setTimeout(() => otpCodeInput.focus(), 350);
+            }
+
+            function hideOtp() {
+                otpStep = false;
+                otpInline.classList.remove('visible');
+                otpCodeInput.value    = '';
+                submitBtn.textContent = 'Sign up';
+            }
+
+            resendBtn.addEventListener('click', () => {
+                // TODO: resend OTP logic
+                resendBtn.textContent = 'Sent!';
+                setTimeout(() => { resendBtn.textContent = "Didn't receive it? Resend code"; }, 3000);
+            });
+
+            // ── Google sign-up ────────────────────────────────────
+            googleBtn.addEventListener('click', async e => {
                 e.preventDefault();
                 try {
                     await signInWithGoogle();
-                    alert('Signed up with Google!');
                     window.location.href = 'home.html';
                 } catch (error) {
                     alert('Google signup failed: ' + error.message);
                 }
             });
 
-            // Check if already signed in
-            onAuthStateChange((user) => {
-                if (user) {
-                    window.location.href = 'home.html';
-                }
+            // ── Terms & Conditions modal ──────────────────────────
+            termsLink.addEventListener('click', () => {
+                termsLayer.classList.add('open');
+            });
+
+            termsClose.addEventListener('click', () => {
+                termsLayer.classList.remove('open');
+            });
+
+            termsAccept.addEventListener('click', () => {
+                termsLayer.classList.remove('open');
+                termsCheckbox.checked = true; // auto-check on accept
+            });
+
+            termsLayer.addEventListener('click', e => {
+                if (e.target === termsLayer) termsLayer.classList.remove('open');
+            });
+
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Escape') termsLayer.classList.remove('open');
+            });
+
+            // ── Redirect if already signed in ────────────────────
+            onAuthStateChange(user => {
+                if (user) window.location.href = 'home.html';
             });
         </script>
     </body>

@@ -9,46 +9,136 @@
 <body class="dashboard">
     <div class="page-shell">
         <header class="topbar">
-            <div class="brand">
+            <a class="brand" href="home.html">
                 <span class="brand-mark">PS</span>
                 <span>PageSync</span>
-            </div>
+            </a>
             <div class="search-box">
-                <input type="search" placeholder="Search books, authors, genres...">
+                <button class="search-trigger" id="search-trigger" aria-label="Open search">
+                    <span class="search-icon">⌕</span>
+                    <span class="search-placeholder">Search books, manga, comics…</span>
+                    <span class="search-hint">NLP ✦</span>
+                </button>
             </div>
             <div class="profile-actions">
-                <button class="button secondary" id="signout-btn">Sign Out</button>
-                <div class="avatar">PS</div>
+                <button class="menu-button" id="menu-btn" aria-label="Open menu">☰</button>
+                <div class="avatar" id="user-avatar">PS</div>
             </div>
         </header>
 
+        <!-- SEARCH MODAL -->
+        <div class="search-layer" id="search-layer" role="dialog" aria-modal="true" aria-label="Search">
+            <div class="search-modal">
+                <div class="search-modal-header">
+                    <div class="search-input-row">
+                        <span class="search-modal-icon">⌕</span>
+                        <input
+                            type="text"
+                            id="search-input"
+                            class="search-modal-input"
+                            placeholder='Try "dark fantasy manga" or "classic survival novels"…'
+                            autocomplete="off"
+                            spellcheck="false"
+                        >
+                        <button class="search-close" id="search-close" aria-label="Close search">✕</button>
+                    </div>
+                    <div class="search-filters">
+                        <button class="filter-chip active" data-source="books">Books</button>
+                        <button class="filter-chip" data-source="manga">Manga</button>
+                        <button class="filter-chip" data-source="comics">Comics</button>
+                        <button class="filter-chip" data-source="classics">Classics</button>
+                        <button class="filter-chip" data-source="harvard">Academic</button>
+                        <button class="filter-chip" data-source="all">All</button>
+                    </div>
+                </div>
+
+                <div class="search-modal-body" id="search-body">
+                    <div class="search-empty" id="search-empty">
+                        <div class="search-empty-icon">✦</div>
+                        <p>Ask anything — try <em>"slow burn romance manga"</em> or <em>"1984 by Orwell"</em></p>
+                    </div>
+
+                    <div class="search-loading" id="search-loading" hidden>
+                        <div class="search-spinner"></div>
+                        <p id="search-loading-text">Thinking…</p>
+                    </div>
+
+                    <div class="search-parsed" id="search-parsed" hidden>
+                        <span class="parsed-label">Searching as:</span>
+                        <span class="parsed-keywords" id="parsed-keywords"></span>
+                        <span class="parsed-source" id="parsed-source"></span>
+                    </div>
+
+                    <div class="search-results" id="search-results" hidden></div>
+
+                    <div class="search-no-results" id="search-no-results" hidden>
+                        <p>No results found. Try a different query or source.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SIDE MENU -->
+        <div class="menu-layer" id="menu-panel">
+            <div class="menu-card">
+                <div class="menu-header">
+                    <div class="menu-profile">
+                        <div class="menu-avatar" id="menu-avatar-display">PS</div>
+                        <div>
+                            <p class="menu-name" id="menu-display-name">PageSync</p>
+                            <p class="menu-sub" id="menu-email">Personal dashboard</p>
+                        </div>
+                    </div>
+                    <button class="menu-close" id="menu-close" aria-label="Close menu">✕</button>
+                </div>
+                <div class="menu-list">
+                    <a class="menu-item active" href="home.html">Home</a>
+                    <a class="menu-item" href="#">User lists</a>
+                    <a class="menu-item" href="#">Popular</a>
+                    <a class="menu-item" href="#">Top rated</a>
+                    <a class="menu-item" href="#">Bookmarks</a>
+                    <a class="menu-item" href="#">Saved lists</a>
+                    <a class="menu-item" href="#">Advanced search</a>
+                    <a class="menu-item" href="#">Trending</a>
+                    <a class="menu-item" href="#">Leaderboard</a>
+                    <a class="menu-item" href="#">Notifications</a>
+                    <a class="menu-item" href="#">Settings</a>
+                    <button class="menu-signout" id="menu-signout">Sign Out</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- DASHBOARD CONTENT -->
         <section class="section">
             <div class="section-header">
                 <h2>Continue Reading</h2>
                 <a href="#">See all</a>
             </div>
-            <div class="section-scroll">
-                <article class="book-card bg-1">
-                    <div class="book-cover">Omniscient Reader</div>
-                    <div class="book-info">
+            <div class="continue-grid">
+                <article class="continue-card bg-1">
+                    <div class="continue-thumb"></div>
+                    <div class="continue-details">
                         <span class="book-tag">Manhwa · Reading</span>
-                        <h3>The Infinite Mage</h3>
+                        <h3>Omniscient Reader</h3>
+                        <p class="continue-title">The Infinite Mage</p>
                         <p class="book-meta">Episode 0 / 254 · 6 months ago</p>
                     </div>
                 </article>
-                <article class="book-card bg-2">
-                    <div class="book-cover">Teenage Mercenary</div>
-                    <div class="book-info">
+                <article class="continue-card bg-2">
+                    <div class="continue-thumb"></div>
+                    <div class="continue-details">
                         <span class="book-tag">Manhwa · Planned</span>
-                        <h3>Blue Lock</h3>
+                        <h3>Teenage Mercenary</h3>
+                        <p class="continue-title">Blue Lock</p>
                         <p class="book-meta">59% read · 29 days ago</p>
                     </div>
                 </article>
-                <article class="book-card bg-3">
-                    <div class="book-cover">Pick Me Up</div>
-                    <div class="book-info">
+                <article class="continue-card bg-3">
+                    <div class="continue-thumb"></div>
+                    <div class="continue-details">
                         <span class="book-tag">Manhwa · Reading</span>
-                        <h3>The Tutorial Is Too Tough!</h3>
+                        <h3>Pick Me Up</h3>
+                        <p class="continue-title">The Tutorial Is Too Tough!</p>
                         <p class="book-meta">Chapter 187 / 193 · 2 months ago</p>
                     </div>
                 </article>
@@ -171,24 +261,183 @@
     </div>
 
     <script type="module">
-        import { onAuthStateChange, signOutUser } from './firebase.js';
+        import { onAuthStateChange, signOutUser, auth } from '../js/firebase.js';
 
-        const signoutBtn = document.getElementById('signout-btn');
+        // ── Auth ──────────────────────────────────────────────────
+        const menuBtn     = document.getElementById('menu-btn');
+        const menuPanel   = document.getElementById('menu-panel');
+        const menuClose   = document.getElementById('menu-close');
+        const menuSignout = document.getElementById('menu-signout');
 
-        signoutBtn.addEventListener('click', async () => {
+        menuBtn.addEventListener('click', () => menuPanel.classList.add('open'));
+        menuClose.addEventListener('click', () => menuPanel.classList.remove('open'));
+        menuPanel.addEventListener('click', e => {
+            if (e.target === menuPanel) menuPanel.classList.remove('open');
+        });
+        menuSignout.addEventListener('click', async () => {
+            try { await signOutUser(); window.location.href = 'login.html'; }
+            catch (err) { alert('Sign out failed: ' + err.message); }
+        });
+
+        onAuthStateChange(user => {
+            if (!user) { window.location.href = 'login.html'; return; }
+            const initials = (user.displayName || user.email || 'PS')
+                .split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+            document.getElementById('user-avatar').textContent          = initials;
+            document.getElementById('menu-avatar-display').textContent  = initials;
+            document.getElementById('menu-display-name').textContent    = user.displayName || 'Reader';
+            document.getElementById('menu-email').textContent           = user.email || '';
+        });
+
+        // ── Search Modal ──────────────────────────────────────────
+        const searchTrigger  = document.getElementById('search-trigger');
+        const searchLayer    = document.getElementById('search-layer');
+        const searchClose    = document.getElementById('search-close');
+        const searchInput    = document.getElementById('search-input');
+
+        const elEmpty        = document.getElementById('search-empty');
+        const elLoading      = document.getElementById('search-loading');
+        const elLoadingTxt   = document.getElementById('search-loading-text');
+        const elParsed       = document.getElementById('search-parsed');
+        const elResults      = document.getElementById('search-results');
+        const elNoResults    = document.getElementById('search-no-results');
+
+        let activeSource  = 'books';
+        let debounceTimer = null;
+
+        searchTrigger.addEventListener('click', openSearch);
+        searchClose.addEventListener('click', closeSearch);
+        searchLayer.addEventListener('click', e => {
+            if (e.target === searchLayer) closeSearch();
+        });
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeSearch();
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault(); openSearch();
+            }
+        });
+
+        function openSearch() {
+            searchLayer.classList.add('open');
+            document.body.style.overflow = 'hidden';
+            setTimeout(() => searchInput.focus(), 80);
+        }
+
+        function closeSearch() {
+            searchLayer.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        // Filter chips
+        document.querySelectorAll('.filter-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+                activeSource = chip.dataset.source;
+                if (searchInput.value.trim()) triggerSearch();
+            });
+        });
+
+        // Debounced input
+        searchInput.addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            if (!searchInput.value.trim()) { showState('empty'); return; }
+            debounceTimer = setTimeout(triggerSearch, 600);
+        });
+        searchInput.addEventListener('keydown', e => {
+            if (e.key === 'Enter') { clearTimeout(debounceTimer); if (searchInput.value.trim()) triggerSearch(); }
+        });
+
+        async function triggerSearch() {
+            const q = searchInput.value.trim();
+            if (!q) return;
+            showState('loading');
+            elLoadingTxt.textContent = 'Thinking…';
+
             try {
-                await signOutUser();
-                window.location.href = 'login.html';
-            } catch (error) {
-                alert('Sign out failed: ' + error.message);
-            }
-        });
+                const res  = await fetch(`/api/search?q=${encodeURIComponent(q)}&source=${activeSource}`);
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Search failed');
 
-        onAuthStateChange((user) => {
-            if (!user) {
-                window.location.href = 'login.html';
+                if (data.parsed) {
+                    document.getElementById('parsed-keywords').textContent = `"${data.parsed.keywords}"`;
+                    document.getElementById('parsed-source').textContent   = data.parsed.source
+                        ? `· ${capitalize(data.parsed.source)}` : '';
+                }
+
+                const results = data.results || [];
+                results.length === 0 ? showState('no-results') : (renderResults(results), showState('results'));
+            } catch (err) {
+                console.error(err);
+                showState('no-results');
             }
-        });
+        }
+
+        function renderResults(results) {
+            elResults.innerHTML = results.map(r => `
+                <article class="result-card">
+                    <div class="result-cover ${r.cover ? '' : 'result-cover-placeholder'}"
+                         ${r.cover ? `style="background-image:url('${r.cover}')"` : ''}>
+                        ${r.cover ? '' : `<span>${escHtml(r.title).slice(0, 2).toUpperCase()}</span>`}
+                    </div>
+                    <div class="result-info">
+                        <div class="result-badges">
+                            <span class="result-source-badge source-${r.source}">${escHtml(r.sourceLabel)}</span>
+                            ${r.status ? `<span class="result-status">${escHtml(r.status)}</span>` : ''}
+                        </div>
+                        <h3 class="result-title">${escHtml(r.title)}</h3>
+                        <p class="result-author">${escHtml(r.author)}</p>
+                        ${r.rating ? `<p class="result-rating">★ ${Number(r.rating).toFixed(1)}</p>` : ''}
+                        ${r.description ? `<p class="result-desc">${escHtml(r.description).slice(0, 100)}…</p>` : ''}
+                    </div>
+                    <button class="result-add" data-book='${escAttr(JSON.stringify(r))}' title="Add to library">+</button>
+                </article>
+            `).join('');
+
+            elResults.querySelectorAll('.result-add').forEach(btn => {
+                btn.addEventListener('click', async e => {
+                    e.stopPropagation();
+                    const book = JSON.parse(btn.dataset.book);
+                    btn.textContent = '…'; btn.disabled = true;
+                    try {
+                        await addToLibrary(book);
+                        btn.textContent = '✓'; btn.classList.add('added');
+                    } catch {
+                        btn.textContent = '!'; btn.disabled = false;
+                    }
+                });
+            });
+        }
+
+        async function addToLibrary(book) {
+            const user = auth.currentUser;
+            if (!user) throw new Error('Not signed in');
+            const token = await user.getIdToken();
+            const res = await fetch('/api/books', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({
+                    title: book.title, author: book.author,
+                    status: 'planned', externalId: book.externalId,
+                    source: book.source, coverUrl: book.cover || '',
+                }),
+            });
+            if (!res.ok) throw new Error('Failed');
+        }
+
+        function showState(state) {
+            elEmpty.hidden     = state !== 'empty';
+            elLoading.hidden   = state !== 'loading';
+            elParsed.hidden    = state !== 'results';
+            elResults.hidden   = state !== 'results';
+            elNoResults.hidden = state !== 'no-results';
+        }
+
+        const capitalize = s => s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
+        const escHtml    = s => (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        const escAttr    = s => (s || '').replace(/'/g, '&#39;');
+
+        showState('empty');
     </script>
 </body>
 </html>

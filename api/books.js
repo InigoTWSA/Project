@@ -1,4 +1,4 @@
-// api/books.js - Vercel serverless function for book operations
+// api/books.js - Vercel serverless function for book operations (not sure if im gonna use this bc im gonna be using apis for books but this is here just in case i need it for some reason)
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
 
