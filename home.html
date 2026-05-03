@@ -6,6 +6,7 @@
     <title>PageSync Dashboard</title>
     <link rel="stylesheet" href="../css/pagesync.css">
     <style>
+        /* ── Avatar link ─────────────────────────────────────────── */
         .avatar {
             cursor: pointer;
             transition: opacity 0.18s, transform 0.18s, box-shadow 0.18s;
@@ -19,460 +20,682 @@
             transform: scale(1.06);
             box-shadow: 0 0 0 2px #3b7df3;
         }
+
+        /* ── Book card ───────────────────────────────────────────── */
+        .book-card {
+            cursor: pointer;
+            transition: transform 0.18s, box-shadow 0.18s;
+            position: relative;
+        }
+        .book-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+        }
+
+        .book-cover {
+            min-height: 220px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+        }
+        .book-cover::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 55%);
+            pointer-events: none;
+        }
+        .book-cover-title {
+            position: relative;
+            z-index: 1;
+            padding: 12px 14px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.25;
+            text-shadow: 0 1px 6px rgba(0,0,0,0.6);
+            word-break: break-word;
+        }
+        .book-cover.no-cover {
+            align-items: center;
+            justify-content: center;
+        }
+        .book-cover-initials {
+            font-size: 36px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.18);
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -60%);
+            z-index: 0;
+            user-select: none;
+        }
+
+        /* Add to library button */
+        .card-add-btn {
+            position: absolute;
+            top: 10px; right: 10px;
+            z-index: 3;
+            width: 30px; height: 30px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.18);
+            background: rgba(10,12,18,0.78);
+            color: #7aabff;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.15s, background 0.15s;
+            backdrop-filter: blur(4px);
+        }
+        .book-card:hover .card-add-btn { opacity: 1; }
+        .card-add-btn:hover { background: rgba(59,125,243,0.55); color: #fff; }
+        .card-add-btn.added { background: rgba(50,170,90,0.55); color: #80ffb0; opacity: 1; }
+
+        /* Source badges */
+        .card-source-badge {
+            font-size: 10px;
+            padding: 2px 7px;
+            border-radius: 999px;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+        .source-open-library { background: rgba(59,125,243,0.15); color: #7aabff; }
+        .source-hardcover    { background: rgba(59,125,243,0.15); color: #7aabff; }
+        .source-manga-eden   { background: rgba(255,100,80,0.15);  color: #ff9080; }
+        .source-comic-vine   { background: rgba(255,190,50,0.15);  color: #ffd070; }
+        .source-gutenberg    { background: rgba(100,200,130,0.15); color: #80e0a0; }
+        .source-harvard      { background: rgba(160,100,240,0.15); color: #c090ff; }
+
+        .book-rating { font-size: 12px; color: #c0a060; margin-top: 4px; }
+
+        /* Continue-reading thumb */
+        .continue-thumb {
+            width: 112px; height: 112px; min-width: 112px;
+            border-radius: 18px;
+            flex-shrink: 0;
+            background-size: cover;
+            background-position: center;
+            background-color: rgba(255,255,255,0.04);
+        }
+
+        /* ── Skeletons ───────────────────────────────────────────── */
+        @keyframes shimmer {
+            0%   { background-position: -600px 0; }
+            100% { background-position:  600px 0; }
+        }
+        .skeleton {
+            background: linear-gradient(90deg,
+                rgba(255,255,255,0.04) 25%,
+                rgba(255,255,255,0.09) 50%,
+                rgba(255,255,255,0.04) 75%);
+            background-size: 600px 100%;
+            animation: shimmer 1.4s infinite linear;
+            border-radius: 12px;
+        }
+        .skeleton-card {
+            min-width: 220px;
+            border-radius: 24px;
+            overflow: hidden;
+            background: #14171d;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .skeleton-cover { height: 220px; }
+        .skeleton-info { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+        .skeleton-line { height: 12px; border-radius: 6px; }
+        .skeleton-line.short { width: 55%; }
+        .skeleton-line.long  { width: 85%; }
+        .skeleton-continue {
+            display: flex; gap: 18px; min-height: 150px;
+            padding: 22px; border-radius: 24px;
+            background: #14171d;
+            border: 1px solid rgba(255,255,255,0.06);
+            align-items: center;
+        }
+        .skeleton-thumb { width: 112px; height: 112px; border-radius: 18px; flex-shrink: 0; }
+        .skeleton-text-block { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+
+        /* ── Empty / error ───────────────────────────────────────── */
+        .section-error { color: #505870; font-size: 14px; padding: 20px 0; min-width: 200px; }
+
+        /* ── Toast ───────────────────────────────────────────────── */
+        .toast {
+            position: fixed; bottom: 28px; left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: #1f2430;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px; padding: 12px 22px;
+            font-size: 14px; color: #d0d5de;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            opacity: 0;
+            transition: opacity 0.22s, transform 0.22s;
+            pointer-events: none; white-space: nowrap; z-index: 99;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
     </style>
 </head>
 <body class="dashboard">
-    <div class="page-shell">
-        <header class="topbar">
-            <a class="brand" href="../home.html">
-                <span class="brand-mark">PS</span>
-                <span>PageSync</span>
-            </a>
-            <div class="search-box">
-                <button class="search-trigger" id="search-trigger" aria-label="Open search">
-                    <span class="search-icon">⌕</span>
-                    <span class="search-placeholder">Search books, manga, comics…</span>
-                    <span class="search-hint">NLP ✦</span>
-                </button>
-            </div>
-            <div class="profile-actions">
-                <button class="menu-button" id="menu-btn" aria-label="Open menu">☰</button>
-                <!-- Avatar is now a link to the profile page -->
-                <a class="avatar" id="user-avatar" href="profile.html" title="View profile" aria-label="View your profile">PS</a>
-            </div>
-        </header>
+<div class="page-shell">
 
-        <!-- SEARCH MODAL -->
-        <div class="search-layer" id="search-layer" role="dialog" aria-modal="true" aria-label="Search">
-            <div class="search-modal">
-                <div class="search-modal-header">
-                    <div class="search-input-row">
-                        <span class="search-modal-icon">⌕</span>
-                        <input
-                            type="text"
-                            id="search-input"
-                            class="search-modal-input"
-                            placeholder='Try "dark fantasy manga" or "classic survival novels"…'
-                            autocomplete="off"
-                            spellcheck="false"
-                        >
-                        <button class="search-close" id="search-close" aria-label="Close search">✕</button>
-                    </div>
-                    <div class="search-filters">
-                        <button class="filter-chip active" data-source="books">Books</button>
-                        <button class="filter-chip" data-source="manga">Manga</button>
-                        <button class="filter-chip" data-source="comics">Comics</button>
-                        <button class="filter-chip" data-source="classics">Classics</button>
-                        <button class="filter-chip" data-source="harvard">Academic</button>
-                        <button class="filter-chip" data-source="all">All</button>
-                    </div>
+    <!-- TOP BAR -->
+    <header class="topbar">
+        <a class="brand" href="home.html">
+            <span class="brand-mark">PS</span>
+            <span>PageSync</span>
+        </a>
+        <div class="search-box">
+            <button class="search-trigger" id="search-trigger" aria-label="Open search">
+                <span class="search-icon">⌕</span>
+                <span class="search-placeholder">Search books, manga, comics…</span>
+                <span class="search-hint">NLP ✦</span>
+            </button>
+        </div>
+        <div class="profile-actions">
+            <button class="menu-button" id="menu-btn" aria-label="Open menu">☰</button>
+            <a class="avatar" id="user-avatar" href="profile.html" title="View profile">PS</a>
+        </div>
+    </header>
+
+    <!-- SEARCH MODAL -->
+    <div class="search-layer" id="search-layer" role="dialog" aria-modal="true" aria-label="Search">
+        <div class="search-modal">
+            <div class="search-modal-header">
+                <div class="search-input-row">
+                    <span class="search-modal-icon">⌕</span>
+                    <input type="text" id="search-input" class="search-modal-input"
+                        placeholder='Try "harry potter" or "romance manhwa"…'
+                        autocomplete="off" spellcheck="false">
+                    <button class="search-close" id="search-close" aria-label="Close">✕</button>
                 </div>
-
-                <div class="search-modal-body" id="search-body">
-                    <div class="search-empty" id="search-empty">
-                        <div class="search-empty-icon">✦</div>
-                        <p>Ask anything — try <em>"slow burn romance manga"</em> or <em>"1984 by Orwell"</em></p>
-                    </div>
-
-                    <div class="search-loading" id="search-loading" hidden>
-                        <div class="search-spinner"></div>
-                        <p id="search-loading-text">Thinking…</p>
-                    </div>
-
-                    <div class="search-parsed" id="search-parsed" hidden>
-                        <span class="parsed-label">Searching as:</span>
-                        <span class="parsed-keywords" id="parsed-keywords"></span>
-                        <span class="parsed-source" id="parsed-source"></span>
-                    </div>
-
-                    <div class="search-results" id="search-results" hidden></div>
-
-                    <div class="search-no-results" id="search-no-results" hidden>
-                        <p>No results found. Try a different query or source.</p>
-                    </div>
+                <div class="search-filters">
+                    <button class="filter-chip active" data-source="books">Books</button>
+                    <button class="filter-chip" data-source="manga">Manga</button>
+                    <button class="filter-chip" data-source="comics">Comics</button>
+                    <button class="filter-chip" data-source="classics">Classics</button>
+                    <button class="filter-chip" data-source="all">All</button>
+                </div>
+            </div>
+            <div class="search-modal-body" id="search-body">
+                <div class="search-empty" id="search-empty">
+                    <div class="search-empty-icon">✦</div>
+                    <p>Ask anything — try <em>"slow burn romance manga"</em> or <em>"1984 by Orwell"</em></p>
+                </div>
+                <div class="search-loading" id="search-loading" hidden>
+                    <div class="search-spinner"></div>
+                    <p id="search-loading-text">Searching…</p>
+                </div>
+                <div class="search-parsed" id="search-parsed" hidden>
+                    <span class="parsed-label">Results for:</span>
+                    <span class="parsed-keywords" id="parsed-keywords"></span>
+                    <span class="parsed-source" id="parsed-source"></span>
+                </div>
+                <div class="search-results" id="search-results" hidden></div>
+                <div class="search-no-results" id="search-no-results" hidden>
+                    <p>No results found. Try a different query or source.</p>
                 </div>
             </div>
         </div>
-
-        <!-- SIDE MENU -->
-        <div class="menu-layer" id="menu-panel">
-            <div class="menu-card">
-                <div class="menu-header">
-                    <div class="menu-profile">
-                        <div class="menu-avatar" id="menu-avatar-display">PS</div>
-                        <div>
-                            <p class="menu-name" id="menu-display-name">PageSync</p>
-                            <p class="menu-sub" id="menu-email">Personal dashboard</p>
-                        </div>
-                    </div>
-                    <button class="menu-close" id="menu-close" aria-label="Close menu">✕</button>
-                </div>
-                <div class="menu-list">
-                    <a class="menu-item active" href="home.html">Home</a>
-                    <a class="menu-item" href="profile.html">Profile</a>
-                    <a class="menu-item" href="#">User lists</a>
-                    <a class="menu-item" href="#">Popular</a>
-                    <a class="menu-item" href="#">Top rated</a>
-                    <a class="menu-item" href="#">Bookmarks</a>
-                    <a class="menu-item" href="#">Saved lists</a>
-                    <a class="menu-item" href="#">Advanced search</a>
-                    <a class="menu-item" href="#">Trending</a>
-                    <a class="menu-item" href="#">Leaderboard</a>
-                    <a class="menu-item" href="#">Notifications</a>
-                    <a class="menu-item" href="#">Settings</a>
-                    <button class="menu-signout" id="menu-signout">Sign Out</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- DASHBOARD CONTENT -->
-        <section class="section">
-            <div class="section-header">
-                <h2>Continue Reading</h2>
-                <a href="#">See all</a>
-            </div>
-            <div class="continue-grid">
-                <article class="continue-card bg-1">
-                    <div class="continue-thumb"></div>
-                    <div class="continue-details">
-                        <span class="book-tag">Manhwa · Reading</span>
-                        <h3>Omniscient Reader</h3>
-                        <p class="continue-title">The Infinite Mage</p>
-                        <p class="book-meta">Episode 0 / 254 · 6 months ago</p>
-                    </div>
-                </article>
-                <article class="continue-card bg-2">
-                    <div class="continue-thumb"></div>
-                    <div class="continue-details">
-                        <span class="book-tag">Manhwa · Planned</span>
-                        <h3>Teenage Mercenary</h3>
-                        <p class="continue-title">Blue Lock</p>
-                        <p class="book-meta">59% read · 29 days ago</p>
-                    </div>
-                </article>
-                <article class="continue-card bg-3">
-                    <div class="continue-thumb"></div>
-                    <div class="continue-details">
-                        <span class="book-tag">Manhwa · Reading</span>
-                        <h3>Pick Me Up</h3>
-                        <p class="continue-title">The Tutorial Is Too Tough!</p>
-                        <p class="book-meta">Chapter 187 / 193 · 2 months ago</p>
-                    </div>
-                </article>
-            </div>
-        </section>
-
-        <section class="section">
-            <div class="section-header">
-                <h2>Your Bookmarks</h2>
-                <a href="#">See more</a>
-            </div>
-            <div class="section-scroll">
-                <article class="book-card bg-4">
-                    <div class="book-cover">Witch Hat Atelier</div>
-                    <div class="book-info">
-                        <span class="book-tag">Manga · Reading</span>
-                        <h3>Witch Hat Atelier</h3>
-                    </div>
-                </article>
-                <article class="book-card bg-5">
-                    <div class="book-cover">The Regressed Mercenary</div>
-                    <div class="book-info">
-                        <span class="book-tag">Manhwa · Completed</span>
-                        <h3>Return of the Blossoming Blade</h3>
-                    </div>
-                </article>
-                <article class="book-card bg-6">
-                    <div class="book-cover">Kagurabachi</div>
-                    <div class="book-info">
-                        <span class="book-tag">Manga · Reading</span>
-                        <h3>Star-Embracing Swordmaster</h3>
-                    </div>
-                </article>
-            </div>
-        </section>
-
-        <section class="section split-grid">
-            <div>
-                <div class="section-header">
-                    <h2>Trending</h2>
-                    <a href="#">See more</a>
-                </div>
-                <div class="section-scroll">
-                    <article class="book-card bg-7">
-                        <div class="book-cover">Sakamoto Days</div>
-                        <div class="book-info">
-                            <span class="book-tag">Manga</span>
-                            <h3>Sakamoto Days</h3>
-                        </div>
-                    </article>
-                    <article class="book-card bg-8">
-                        <div class="book-cover">The Infinite Mage</div>
-                        <div class="book-info">
-                            <span class="book-tag">Manhwa</span>
-                            <h3>The Infinite Mage</h3>
-                        </div>
-                    </article>
-                    <article class="book-card bg-9">
-                        <div class="book-cover">Blue Lock</div>
-                        <div class="book-info">
-                            <span class="book-tag">Manga</span>
-                            <h3>Blue Lock</h3>
-                        </div>
-                    </article>
-                </div>
-            </div>
-            <div>
-                <div class="section-header">
-                    <h2>Most Bookmarked</h2>
-                    <a href="#">See more</a>
-                </div>
-                <div class="section-scroll">
-                    <article class="book-card bg-10">
-                        <div class="book-cover">You're the Only One I Can See</div>
-                        <div class="book-info">
-                            <span class="book-tag">Manhwa · Reading</span>
-                            <h3>You're the Only One I Can See</h3>
-                        </div>
-                    </article>
-                    <article class="book-card bg-11">
-                        <div class="book-cover">Vagabond</div>
-                        <div class="book-info">
-                            <span class="book-tag">Manga</span>
-                            <h3>Vagabond</h3>
-                        </div>
-                    </article>
-                </div>
-            </div>
-        </section>
-
-        <section class="section">
-            <div class="section-header">
-                <h2>Popular</h2>
-                <a href="#">See more</a>
-            </div>
-            <div class="section-scroll">
-                <article class="book-card bg-12">
-                    <div class="book-cover">Chainsaw Man</div>
-                    <div class="book-info">
-                        <span class="book-tag">Manga · Popular</span>
-                        <h3>Chainsaw Man</h3>
-                    </div>
-                </article>
-                <article class="book-card bg-13">
-                    <div class="book-cover">One Piece</div>
-                    <div class="book-info">
-                        <span class="book-tag">Manga · Popular</span>
-                        <h3>One Piece</h3>
-                    </div>
-                </article>
-                <article class="book-card bg-14">
-                    <div class="book-cover">Monster</div>
-                    <div class="book-info">
-                        <span class="book-tag">Manga · Popular</span>
-                        <h3>Monster</h3>
-                    </div>
-                </article>
-            </div>
-        </section>
     </div>
 
-    <script type="module">
-        import { onAuthStateChange, signOutUser, auth } from './firebase.js';
+    <!-- SIDE MENU -->
+    <div class="menu-layer" id="menu-panel">
+        <div class="menu-card">
+            <div class="menu-header">
+                <div class="menu-profile">
+                    <div class="menu-avatar" id="menu-avatar-display">PS</div>
+                    <div>
+                        <p class="menu-name" id="menu-display-name">PageSync</p>
+                        <p class="menu-sub" id="menu-email">Personal dashboard</p>
+                    </div>
+                </div>
+                <button class="menu-close" id="menu-close" aria-label="Close menu">✕</button>
+            </div>
+            <div class="menu-list">
+                <a class="menu-item active" href="home.html">Home</a>
+                <a class="menu-item" href="profile.html">Profile</a>
+                <a class="menu-item" href="#">User lists</a>
+                <a class="menu-item" href="#">Popular</a>
+                <a class="menu-item" href="#">Top rated</a>
+                <a class="menu-item" href="#">Bookmarks</a>
+                <a class="menu-item" href="#">Saved lists</a>
+                <a class="menu-item" href="#">Advanced search</a>
+                <a class="menu-item" href="#">Trending</a>
+                <a class="menu-item" href="#">Leaderboard</a>
+                <a class="menu-item" href="#">Notifications</a>
+                <a class="menu-item" href="#">Settings</a>
+                <button class="menu-signout" id="menu-signout">Sign Out</button>
+            </div>
+        </div>
+    </div>
 
-        // ── Auth ──────────────────────────────────────────────────
-        const menuBtn     = document.getElementById('menu-btn');
-        const menuPanel   = document.getElementById('menu-panel');
-        const menuClose   = document.getElementById('menu-close');
-        const menuSignout = document.getElementById('menu-signout');
+    <!-- DASHBOARD — all rendered by JS -->
 
-        menuBtn.addEventListener('click', () => menuPanel.classList.add('open'));
-        menuClose.addEventListener('click', () => menuPanel.classList.remove('open'));
-        menuPanel.addEventListener('click', e => {
-            if (e.target === menuPanel) menuPanel.classList.remove('open');
+    <section class="section">
+        <div class="section-header">
+            <h2>Continue Reading</h2>
+            <a href="#">See all</a>
+        </div>
+        <div class="continue-grid" id="continue-grid"></div>
+    </section>
+
+    <section class="section">
+        <div class="section-header">
+            <h2>Trending Manga</h2>
+            <a href="#" data-prefill="popular action manga" data-source="manga">See more</a>
+        </div>
+        <div class="section-scroll" id="section-manga"></div>
+    </section>
+
+    <section class="section">
+        <div class="section-header">
+            <h2>Popular Books</h2>
+            <a href="#" data-prefill="bestselling fiction" data-source="books">See more</a>
+        </div>
+        <div class="section-scroll" id="section-books"></div>
+    </section>
+
+    <section class="section split-grid">
+        <div>
+            <div class="section-header">
+                <h2>Classic Literature</h2>
+                <a href="#" data-prefill="classic literature" data-source="classics">See more</a>
+            </div>
+            <div class="section-scroll" id="section-classics"></div>
+        </div>
+        <div>
+            <div class="section-header">
+                <h2>Comics &amp; Graphic Novels</h2>
+                <a href="#" data-prefill="graphic novel superhero" data-source="comics">See more</a>
+            </div>
+            <div class="section-scroll" id="section-comics"></div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section-header">
+            <h2>Romance Manhwa</h2>
+            <a href="#" data-prefill="romance manhwa" data-source="manga">See more</a>
+        </div>
+        <div class="section-scroll" id="section-romance"></div>
+    </section>
+
+    <section class="section">
+        <div class="section-header">
+            <h2>Fantasy &amp; Adventure</h2>
+            <a href="#" data-prefill="fantasy adventure" data-source="books">See more</a>
+        </div>
+        <div class="section-scroll" id="section-fantasy"></div>
+    </section>
+
+</div><!-- /.page-shell -->
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+    import { onAuthStateChange, signOutUser, auth, getBooks, addBook } from './firebase.js';
+    import { clientSearch } from './search-client.js';
+
+    // ── Helpers ────────────────────────────────────────────────────
+    const esc     = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    const escAttr = s => (s||'').replace(/'/g,'&#39;');
+    const capitalize = s => s ? s[0].toUpperCase() + s.slice(1) : '';
+    const BG = i => `bg-${(i % 14) + 1}`;
+
+    let toastTimer;
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+    }
+
+    // ── Skeleton HTML ──────────────────────────────────────────────
+    const skelCards = n => Array.from({length: n}, () => `
+        <div class="skeleton-card">
+            <div class="skeleton skeleton-cover"></div>
+            <div class="skeleton-info">
+                <div class="skeleton skeleton-line short"></div>
+                <div class="skeleton skeleton-line long"></div>
+                <div class="skeleton skeleton-line" style="width:45%"></div>
+            </div>
+        </div>`).join('');
+
+    const skelContinue = n => Array.from({length: n}, () => `
+        <div class="skeleton-continue">
+            <div class="skeleton skeleton-thumb"></div>
+            <div class="skeleton-text-block">
+                <div class="skeleton skeleton-line long"></div>
+                <div class="skeleton skeleton-line short"></div>
+                <div class="skeleton skeleton-line" style="width:38%"></div>
+            </div>
+        </div>`).join('');
+
+    // ── Render a scroll section ────────────────────────────────────
+    function renderSection(id, books) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (!books?.length) {
+            el.innerHTML = `<p class="section-error">Nothing found right now — try refreshing.</p>`;
+            return;
+        }
+        el.innerHTML = books.map((b, i) => {
+            const hasCover  = !!b.cover;
+            const coverStyle = hasCover ? `background-image:url('${esc(b.cover)}');background-size:cover;background-position:center;` : '';
+            const coverCls   = `book-cover${hasCover ? '' : ' no-cover ' + BG(i)}`;
+            return `
+            <article class="book-card" data-book='${escAttr(JSON.stringify(b))}'>
+                <div class="${coverCls}" style="${coverStyle}">
+                    ${!hasCover ? `<span class="book-cover-initials">${esc((b.title||'?').slice(0,2).toUpperCase())}</span>` : ''}
+                    <span class="book-cover-title">${esc(b.title)}</span>
+                </div>
+                <div class="book-info">
+                    <span class="card-source-badge source-${esc(b.source)}">${esc(b.sourceLabel||'Book')}</span>
+                    <h3>${esc(b.title)}</h3>
+                    <p class="book-meta">${esc(b.author)}</p>
+                    ${b.rating ? `<p class="book-rating">★ ${Number(b.rating).toFixed(1)}</p>` : ''}
+                </div>
+                <button class="card-add-btn" title="Add to library">+</button>
+            </article>`;
+        }).join('');
+
+        el.querySelectorAll('.book-card').forEach(card => {
+            const book = JSON.parse(card.dataset.book);
+            card.querySelector('.card-add-btn').addEventListener('click', e => {
+                e.stopPropagation();
+                saveBook(book, e.currentTarget);
+            });
         });
-        menuSignout.addEventListener('click', async () => {
-            try { await signOutUser(); window.location.href = 'login.html'; }
-            catch (err) { alert('Sign out failed: ' + err.message); }
-        });
+    }
 
-        onAuthStateChange(user => {
-            if (!user) { window.location.href = 'login.html'; return; }
+    // ── Save to Firestore library ──────────────────────────────────
+    async function saveBook(book, btn) {
+        const user = auth.currentUser;
+        if (!user) { showToast('Sign in to save books'); return; }
+        btn.textContent = '…'; btn.disabled = true;
+        try {
+            await addBook(user.uid, {
+                title:      book.title,
+                author:     book.author,
+                status:     'planned',
+                externalId: book.externalId,
+                source:     book.source,
+                coverUrl:   book.cover || '',
+            });
+            btn.textContent = '✓';
+            btn.classList.add('added');
+            showToast(`"${book.title}" added to your library`);
+        } catch (err) {
+            btn.textContent = '+';
+            btn.disabled = false;
+            showToast('Could not save — try again');
+            console.error(err);
+        }
+    }
 
-            const avatarEl = document.getElementById('user-avatar');
-            const menuAvatarEl = document.getElementById('menu-avatar-display');
+    // ── Continue Reading ───────────────────────────────────────────
+    async function loadContinueReading(uid) {
+        const grid = document.getElementById('continue-grid');
+        grid.innerHTML = skelContinue(3);
 
-            // Load profile photo or fall back to initials
-            const savedPhoto = localStorage.getItem(`ps_avatar_${user.uid}`);
-            if (savedPhoto) {
-                avatarEl.style.backgroundImage = `url('${savedPhoto}')`;
-                avatarEl.textContent = '';
-                menuAvatarEl.style.backgroundImage = `url('${savedPhoto}')`;
-                menuAvatarEl.style.backgroundSize = 'cover';
-                menuAvatarEl.style.backgroundPosition = 'center';
-                menuAvatarEl.textContent = '';
-            } else {
-                const initials = (user.displayName || user.email || 'PS')
-                    .split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-                avatarEl.textContent = initials;
-                menuAvatarEl.textContent = initials;
-            }
+        let books = [];
+        try { books = await getBooks(uid); } catch (e) { console.warn(e); }
 
-            const savedUsername = localStorage.getItem(`ps_username_${user.uid}`);
-            document.getElementById('menu-display-name').textContent =
-                savedUsername || user.displayName || 'Reader';
-            document.getElementById('menu-email').textContent = user.email || '';
-        });
-
-        // ── Search Modal ──────────────────────────────────────────
-        const searchTrigger  = document.getElementById('search-trigger');
-        const searchLayer    = document.getElementById('search-layer');
-        const searchClose    = document.getElementById('search-close');
-        const searchInput    = document.getElementById('search-input');
-
-        const elEmpty        = document.getElementById('search-empty');
-        const elLoading      = document.getElementById('search-loading');
-        const elLoadingTxt   = document.getElementById('search-loading-text');
-        const elParsed       = document.getElementById('search-parsed');
-        const elResults      = document.getElementById('search-results');
-        const elNoResults    = document.getElementById('search-no-results');
-
-        let activeSource  = 'books';
-        let debounceTimer = null;
-
-        searchTrigger.addEventListener('click', openSearch);
-        searchClose.addEventListener('click', closeSearch);
-        searchLayer.addEventListener('click', e => {
-            if (e.target === searchLayer) closeSearch();
-        });
-        document.addEventListener('keydown', e => {
-            if (e.key === 'Escape') closeSearch();
-            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-                e.preventDefault(); openSearch();
-            }
-        });
-
-        function openSearch() {
-            searchLayer.classList.add('open');
-            document.body.style.overflow = 'hidden';
-            setTimeout(() => searchInput.focus(), 80);
+        if (!books.length) {
+            // Suggest popular picks if library is empty
+            try {
+                const { results } = await clientSearch('popular manga', 'manga', 3);
+                books = results.map(b => ({...b, _suggested: true}));
+            } catch { /* offline */ }
         }
 
-        function closeSearch() {
-            searchLayer.classList.remove('open');
-            document.body.style.overflow = '';
+        if (!books.length) {
+            grid.innerHTML = `<div style="grid-column:1/-1;padding:20px 0">
+                <p style="color:#505870;font-size:14px">Search for books above to start building your library.</p>
+            </div>`;
+            return;
         }
 
-        // Filter chips
-        document.querySelectorAll('.filter-chip').forEach(chip => {
-            chip.addEventListener('click', () => {
+        const sorted = [
+            ...books.filter(b => b.status === 'reading'),
+            ...books.filter(b => b.status !== 'reading'),
+        ].slice(0, 3);
+
+        grid.innerHTML = sorted.map((b, i) => {
+            const url      = b.coverUrl || b.cover || '';
+            const hasCover = !!url;
+            const thumbStyle = hasCover
+                ? `background-image:url('${esc(url)}');background-size:cover;background-position:center;`
+                : '';
+            const tag = b._suggested
+                ? `${esc(b.sourceLabel||'Book')} · Suggested`
+                : `${esc(b.source||'')} · ${esc(b.status||'saved')}`;
+            return `
+            <article class="continue-card ${hasCover ? '' : BG(i)}">
+                <div class="continue-thumb ${hasCover ? '' : BG(i)}" style="${thumbStyle}"></div>
+                <div class="continue-details">
+                    <span class="book-tag">${tag}</span>
+                    <h3>${esc(b.title||'Unknown')}</h3>
+                    <p class="continue-title">${esc(b.author||'')}</p>
+                    ${b.addedAt ? `<p class="book-meta">${relTime(b.addedAt)}</p>` : ''}
+                </div>
+            </article>`;
+        }).join('');
+    }
+
+    function relTime(ts) {
+        const d    = ts?.toDate ? ts.toDate() : new Date(ts);
+        const days = Math.floor((Date.now() - d) / 86400000);
+        if (days === 0) return 'Today';
+        if (days === 1) return 'Yesterday';
+        if (days < 30)  return `${days} days ago`;
+        if (days < 365) return `${Math.floor(days/30)} months ago`;
+        return `${Math.floor(days/365)}y ago`;
+    }
+
+    // ── Load dashboard sections in parallel ────────────────────────
+    async function loadDashboard() {
+        ['section-manga','section-books','section-classics','section-comics','section-romance','section-fantasy']
+            .forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = skelCards(6); });
+
+        const [manga, books, classics, comics, romance, fantasy] = await Promise.allSettled([
+            clientSearch('popular action manga',       'manga',   8),
+            clientSearch('bestselling fiction',         'books',   8),
+            clientSearch('classic literature',          'classics', 8),
+            clientSearch('graphic novel superhero',    'comics',  8),
+            clientSearch('romance manhwa webtoon',      'manga',   8),
+            clientSearch('fantasy adventure novel',     'books',   8),
+        ]);
+
+        const val = r => r.status === 'fulfilled' ? r.value.results : [];
+        renderSection('section-manga',    val(manga));
+        renderSection('section-books',    val(books));
+        renderSection('section-classics', val(classics));
+        renderSection('section-comics',   val(comics));
+        renderSection('section-romance',  val(romance));
+        renderSection('section-fantasy',  val(fantasy));
+    }
+
+    // ── Auth ───────────────────────────────────────────────────────
+    const menuBtn     = document.getElementById('menu-btn');
+    const menuPanel   = document.getElementById('menu-panel');
+    const menuClose   = document.getElementById('menu-close');
+    const menuSignout = document.getElementById('menu-signout');
+
+    menuBtn.addEventListener('click',   () => menuPanel.classList.add('open'));
+    menuClose.addEventListener('click', () => menuPanel.classList.remove('open'));
+    menuPanel.addEventListener('click', e => { if (e.target === menuPanel) menuPanel.classList.remove('open'); });
+    menuSignout.addEventListener('click', async () => {
+        try { await signOutUser(); window.location.href = 'login.html'; }
+        catch (err) { alert('Sign out failed: ' + err.message); }
+    });
+
+    onAuthStateChange(user => {
+        if (!user) { window.location.href = 'login.html'; return; }
+
+        const avatarEl     = document.getElementById('user-avatar');
+        const menuAvatarEl = document.getElementById('menu-avatar-display');
+        const photo        = localStorage.getItem(`ps_avatar_${user.uid}`);
+
+        if (photo) {
+            avatarEl.style.backgroundImage = `url('${photo}')`;
+            avatarEl.textContent = '';
+            menuAvatarEl.style.cssText = `background-image:url('${photo}');background-size:cover;background-position:center;`;
+            menuAvatarEl.textContent = '';
+        } else {
+            const initials = (user.displayName || user.email || 'PS')
+                .split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+            avatarEl.textContent = initials;
+            menuAvatarEl.textContent = initials;
+        }
+
+        document.getElementById('menu-display-name').textContent =
+            localStorage.getItem(`ps_username_${user.uid}`) || user.displayName || 'Reader';
+        document.getElementById('menu-email').textContent = user.email || '';
+
+        loadContinueReading(user.uid);
+    });
+
+    // Kick off section loading immediately (no auth needed)
+    loadDashboard();
+
+    // ── "See more" links pre-fill search ──────────────────────────
+    document.querySelectorAll('[data-prefill]').forEach(link => {
+        link.addEventListener('click', e => {
+            e.preventDefault();
+            const src  = link.dataset.source;
+            const chip = document.querySelector(`.filter-chip[data-source="${src}"]`);
+            if (chip) {
                 document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
                 chip.classList.add('active');
-                activeSource = chip.dataset.source;
-                if (searchInput.value.trim()) triggerSearch();
-            });
-        });
-
-        // Debounced input
-        searchInput.addEventListener('input', () => {
-            clearTimeout(debounceTimer);
-            if (!searchInput.value.trim()) { showState('empty'); return; }
-            debounceTimer = setTimeout(triggerSearch, 600);
-        });
-        searchInput.addEventListener('keydown', e => {
-            if (e.key === 'Enter') { clearTimeout(debounceTimer); if (searchInput.value.trim()) triggerSearch(); }
-        });
-
-        async function triggerSearch() {
-            const q = searchInput.value.trim();
-            if (!q) return;
-            showState('loading');
-            elLoadingTxt.textContent = 'Thinking…';
-
-            try {
-                const res  = await fetch(`/api/search?q=${encodeURIComponent(q)}&source=${activeSource}`);
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.error || 'Search failed');
-
-                if (data.parsed) {
-                    document.getElementById('parsed-keywords').textContent = `"${data.parsed.keywords}"`;
-                    document.getElementById('parsed-source').textContent   = data.parsed.source
-                        ? `· ${capitalize(data.parsed.source)}` : '';
-                }
-
-                const results = data.results || [];
-                results.length === 0 ? showState('no-results') : (renderResults(results), showState('results'));
-            } catch (err) {
-                console.error(err);
-                showState('no-results');
+                activeSource = src;
             }
-        }
+            openSearch(link.dataset.prefill);
+        });
+    });
 
-        function renderResults(results) {
-            elResults.innerHTML = results.map(r => `
-                <article class="result-card">
-                    <div class="result-cover ${r.cover ? '' : 'result-cover-placeholder'}"
-                         ${r.cover ? `style="background-image:url('${r.cover}')"` : ''}>
-                        ${r.cover ? '' : `<span>${escHtml(r.title).slice(0, 2).toUpperCase()}</span>`}
+    // ── Search Modal ───────────────────────────────────────────────
+    const searchTrigger = document.getElementById('search-trigger');
+    const searchLayer   = document.getElementById('search-layer');
+    const searchClose   = document.getElementById('search-close');
+    const searchInput   = document.getElementById('search-input');
+    const elEmpty       = document.getElementById('search-empty');
+    const elLoading     = document.getElementById('search-loading');
+    const elParsed      = document.getElementById('search-parsed');
+    const elResults     = document.getElementById('search-results');
+    const elNoResults   = document.getElementById('search-no-results');
+
+    let activeSource  = 'books';
+    let debounceTimer = null;
+
+    searchTrigger.addEventListener('click', () => openSearch());
+    searchClose.addEventListener('click', closeSearch);
+    searchLayer.addEventListener('click', e => { if (e.target === searchLayer) closeSearch(); });
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeSearch();
+        if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); openSearch(); }
+    });
+
+    function openSearch(prefill = '') {
+        searchLayer.classList.add('open');
+        document.body.style.overflow = 'hidden';
+        setTimeout(() => {
+            searchInput.focus();
+            if (prefill && prefill !== searchInput.value) {
+                searchInput.value = prefill;
+                triggerSearch();
+            }
+        }, 80);
+    }
+
+    function closeSearch() {
+        searchLayer.classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    document.querySelectorAll('.filter-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            activeSource = chip.dataset.source;
+            if (searchInput.value.trim()) triggerSearch();
+        });
+    });
+
+    searchInput.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        if (!searchInput.value.trim()) { showModalState('empty'); return; }
+        debounceTimer = setTimeout(triggerSearch, 500);
+    });
+    searchInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter') { clearTimeout(debounceTimer); if (searchInput.value.trim()) triggerSearch(); }
+    });
+
+    async function triggerSearch() {
+        const q = searchInput.value.trim();
+        if (!q) return;
+        showModalState('loading');
+        try {
+            const { results, parsed } = await clientSearch(q, activeSource, 20);
+
+            if (parsed?.keywords) {
+                document.getElementById('parsed-keywords').textContent = `"${parsed.keywords}"`;
+                document.getElementById('parsed-source').textContent =
+                    parsed.source ? `· ${capitalize(parsed.source)}` : '';
+            }
+
+            results.length
+                ? (renderModalResults(results), showModalState('results'))
+                : showModalState('no-results');
+        } catch (err) {
+            console.error(err);
+            showModalState('no-results');
+        }
+    }
+
+    function renderModalResults(results) {
+        elResults.innerHTML = results.map(r => `
+            <article class="result-card">
+                <div class="result-cover ${r.cover ? '' : 'result-cover-placeholder'}"
+                     ${r.cover ? `style="background-image:url('${esc(r.cover)}')"` : ''}>
+                    ${r.cover ? '' : `<span>${esc(r.title).slice(0,2).toUpperCase()}</span>`}
+                </div>
+                <div class="result-info">
+                    <div class="result-badges">
+                        <span class="result-source-badge source-${r.source}">${esc(r.sourceLabel||'Book')}</span>
+                        ${r.status ? `<span class="result-status">${esc(r.status)}</span>` : ''}
                     </div>
-                    <div class="result-info">
-                        <div class="result-badges">
-                            <span class="result-source-badge source-${r.source}">${escHtml(r.sourceLabel)}</span>
-                            ${r.status ? `<span class="result-status">${escHtml(r.status)}</span>` : ''}
-                        </div>
-                        <h3 class="result-title">${escHtml(r.title)}</h3>
-                        <p class="result-author">${escHtml(r.author)}</p>
-                        ${r.rating ? `<p class="result-rating">★ ${Number(r.rating).toFixed(1)}</p>` : ''}
-                        ${r.description ? `<p class="result-desc">${escHtml(r.description).slice(0, 100)}…</p>` : ''}
-                    </div>
-                    <button class="result-add" data-book='${escAttr(JSON.stringify(r))}' title="Add to library">+</button>
-                </article>
-            `).join('');
+                    <h3 class="result-title">${esc(r.title)}</h3>
+                    <p class="result-author">${esc(r.author)}</p>
+                    ${r.rating ? `<p class="result-rating">★ ${Number(r.rating).toFixed(1)}</p>` : ''}
+                    ${r.description ? `<p class="result-desc">${esc(r.description).slice(0,120)}…</p>` : ''}
+                </div>
+                <button class="result-add" data-book='${escAttr(JSON.stringify(r))}' title="Add to library">+</button>
+            </article>`).join('');
 
-            elResults.querySelectorAll('.result-add').forEach(btn => {
-                btn.addEventListener('click', async e => {
-                    e.stopPropagation();
-                    const book = JSON.parse(btn.dataset.book);
-                    btn.textContent = '…'; btn.disabled = true;
-                    try {
-                        await addToLibrary(book);
-                        btn.textContent = '✓'; btn.classList.add('added');
-                    } catch {
-                        btn.textContent = '!'; btn.disabled = false;
-                    }
-                });
+        elResults.querySelectorAll('.result-add').forEach(btn => {
+            btn.addEventListener('click', e => {
+                e.stopPropagation();
+                saveBook(JSON.parse(btn.dataset.book), btn);
             });
-        }
+        });
+    }
 
-        async function addToLibrary(book) {
-            const user = auth.currentUser;
-            if (!user) throw new Error('Not signed in');
-            const token = await user.getIdToken();
-            const res = await fetch('/api/books', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify({
-                    title: book.title, author: book.author,
-                    status: 'planned', externalId: book.externalId,
-                    source: book.source, coverUrl: book.cover || '',
-                }),
-            });
-            if (!res.ok) throw new Error('Failed');
-        }
+    function showModalState(state) {
+        elEmpty.hidden     = state !== 'empty';
+        elLoading.hidden   = state !== 'loading';
+        elParsed.hidden    = state !== 'results';
+        elResults.hidden   = state !== 'results';
+        elNoResults.hidden = state !== 'no-results';
+    }
 
-        function showState(state) {
-            elEmpty.hidden     = state !== 'empty';
-            elLoading.hidden   = state !== 'loading';
-            elParsed.hidden    = state !== 'results';
-            elResults.hidden   = state !== 'results';
-            elNoResults.hidden = state !== 'no-results';
-        }
-
-        const capitalize = s => s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
-        const escHtml    = s => (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-        const escAttr    = s => (s || '').replace(/'/g, '&#39;');
-
-        showState('empty');
-    </script>
+    showModalState('empty');
+</script>
 </body>
 </html>
