@@ -5,6 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PageSync Dashboard</title>
     <link rel="stylesheet" href="../css/pagesync.css">
+    <style>
+        .avatar {
+            cursor: pointer;
+            transition: opacity 0.18s, transform 0.18s, box-shadow 0.18s;
+            text-decoration: none;
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+        }
+        .avatar:hover {
+            opacity: 0.85;
+            transform: scale(1.06);
+            box-shadow: 0 0 0 2px #3b7df3;
+        }
+    </style>
 </head>
 <body class="dashboard">
     <div class="page-shell">
@@ -22,7 +37,8 @@
             </div>
             <div class="profile-actions">
                 <button class="menu-button" id="menu-btn" aria-label="Open menu">☰</button>
-                <div class="avatar" id="user-avatar">PS</div>
+                <!-- Avatar is now a link to the profile page -->
+                <a class="avatar" id="user-avatar" href="profile.html" title="View profile" aria-label="View your profile">PS</a>
             </div>
         </header>
 
@@ -93,6 +109,7 @@
                 </div>
                 <div class="menu-list">
                     <a class="menu-item active" href="home.html">Home</a>
+                    <a class="menu-item" href="profile.html">Profile</a>
                     <a class="menu-item" href="#">User lists</a>
                     <a class="menu-item" href="#">Popular</a>
                     <a class="menu-item" href="#">Top rated</a>
@@ -281,12 +298,30 @@
 
         onAuthStateChange(user => {
             if (!user) { window.location.href = 'login.html'; return; }
-            const initials = (user.displayName || user.email || 'PS')
-                .split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-            document.getElementById('user-avatar').textContent          = initials;
-            document.getElementById('menu-avatar-display').textContent  = initials;
-            document.getElementById('menu-display-name').textContent    = user.displayName || 'Reader';
-            document.getElementById('menu-email').textContent           = user.email || '';
+
+            const avatarEl = document.getElementById('user-avatar');
+            const menuAvatarEl = document.getElementById('menu-avatar-display');
+
+            // Load profile photo or fall back to initials
+            const savedPhoto = localStorage.getItem(`ps_avatar_${user.uid}`);
+            if (savedPhoto) {
+                avatarEl.style.backgroundImage = `url('${savedPhoto}')`;
+                avatarEl.textContent = '';
+                menuAvatarEl.style.backgroundImage = `url('${savedPhoto}')`;
+                menuAvatarEl.style.backgroundSize = 'cover';
+                menuAvatarEl.style.backgroundPosition = 'center';
+                menuAvatarEl.textContent = '';
+            } else {
+                const initials = (user.displayName || user.email || 'PS')
+                    .split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+                avatarEl.textContent = initials;
+                menuAvatarEl.textContent = initials;
+            }
+
+            const savedUsername = localStorage.getItem(`ps_username_${user.uid}`);
+            document.getElementById('menu-display-name').textContent =
+                savedUsername || user.displayName || 'Reader';
+            document.getElementById('menu-email').textContent = user.email || '';
         });
 
         // ── Search Modal ──────────────────────────────────────────
